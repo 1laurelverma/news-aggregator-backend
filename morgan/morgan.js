@@ -13,8 +13,8 @@ morgan.token("date", (req, res) => {
 });
 
 let logsinfo = fsr.getStream({
-  filename: "./logs/log.%DATE%.txt",
-  frequency: "60m",
+  filename: "tmp/logs/log.%DATE%.txt",
+  frequency: "120m",
   verbose: false,
   date_format: "DDMMYYYY",
 });
