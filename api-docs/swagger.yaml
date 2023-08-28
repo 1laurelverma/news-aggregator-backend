@@ -1,0 +1,471 @@
+openapi: 3.0.0
+info:
+  title: News Aggregator
+  description: News Aggregator .
+  version: 0.0.1
+
+servers:
+  - url: http://localhost:8000
+    description: localhost environment
+
+tags:
+  - name: News Aggregator
+    description: API to manage the News Aggregator.
+
+components:
+  securitySchemes:
+    APIKey:
+      type: apiKey
+      name: Authorization
+      in: header
+  security:
+    - APIKey: []
+
+
+definitions:
+  
+  news: 
+    type: object
+    properties:
+      news:
+        type: string
+  
+  editor:
+    type: object
+    properties:
+      name:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+  
+  Category:
+    type: object
+    properties:
+      name:
+        type: string
+      author:
+        type: string
+      title:
+        type: string
+      description:
+        type: string
+      content:
+        type: string
+     
+  Query:
+    type: object
+    properties:
+      name:
+        type: string
+      author:
+        type: string
+      title:
+        type: string
+      description:
+        type: string
+      content:
+        type: string
+
+  article:
+    type: object
+    properties:
+      id:
+        type: string
+      title:
+        type: string
+      content:
+        type: string
+      author:
+        type: string
+
+paths:
+
+  /signup:
+    post:
+      tags: [user]
+      summary: Signup
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: Provide the signup details of the user
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                categories:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                image:
+                  type: string
+                  format: binary
+              
+              
+      responses:
+        '201':
+          description: User Registered Successfully ...
+        '400':
+          description: User already exists
+        '422':
+          description: Email already exists
+        '500':
+          description: Internal Server Error
+
+  /login:
+    post:
+      tags: [user]
+      summary: login
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: To login the user by giving email and password
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  default: newuser@gmail.com
+                password:
+                  type: string
+                  default: newuser
+      responses:
+        '500':
+          description: Error in saving
+
+
+  /user:
+    get:
+      tags: [user]
+      summary: returns the user
+      security: 
+        - APIKey: []
+      responses:
+        '200':
+          description: returns user details
+          content: 
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  name:
+                    type: string
+                  categories:
+                    type: string
+                  email:
+                    type: string
+                  image:
+                    type: string
+                    
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /updateUser:
+    patch:
+      tags: [user]
+      summary: Updates the user details
+      security: 
+        - APIKey: []
+      consumes:
+        - application/json
+      produces:
+        - application/json  
+      requestBody:
+        description: Updates the user details
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                cateogries:
+                  type: string
+                name: 
+                  type: string
+                picture:
+                  type: string
+                  format: binary
+                
+      responses:
+        '200':
+          description: User updated successfully...
+        '400':
+          description: Validation Error
+        '500':
+          description: Internal Server Error
+  
+  /deleteuser:
+    delete:
+      tags: [user]
+      summary: deletes the user
+      security:
+        - APIKey: []
+      parameters:
+        - name: userid
+          default:
+          in: path
+          schema:
+            type: string
+      produces:
+        - application/json
+      responses:
+        "201":
+          description: user deleted successfully
+        "400":
+          description: validation error
+        "500":
+          description: internal server error
+
+
+      responses:
+        '200':
+          description: deletes the user
+
+  /news:
+    get: 
+      tags: [news]
+      summary: returns all categories
+      security: 
+        - APIKey: []
+      responses:
+        '200':
+          description: returns all categories
+          content: 
+            application/json:
+              schema: 
+                $ref: '#definitions/news'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /news/{category}:
+    get: 
+      tags: [news]
+      summary: returns a news of particular category
+      security: 
+        - APIKey: []
+      parameters:
+        - name: category
+          default: 'sports'
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: returns a nwes of particular category
+          content: 
+            application/json:
+              schema: 
+                $ref: '#definitions/Category'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /news/{queryName}:
+    get:
+      tags: [news]
+      summary: returns news for the searched query
+      security: 
+        - APIKey: []
+      parameters:
+        - name: queryName
+          default: 'batman'
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: returns news for the searched query
+          content:
+            application/json:
+              schema: 
+                $ref: '#definitions/Query'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /editorSignup:
+    post:
+      tags: [editor]
+      summary: Signup
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: Username & Password
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#definitions/editor'
+
+      responses:
+        '201':
+          description: User Registered Successfully ...
+        '400':
+          description: User already exists
+        '422':
+          description: Email already exists
+        '500':
+          description: Internal Server Error
+
+  /editorLogin:
+    post:
+      tags: [editor]
+      summary: login
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: Username & Password
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '500':
+          description: Error in saving
+
+  /editor:
+    get:
+      tags: [editor]
+      summary: returns the editor
+      security: 
+        - APIKey: []
+      responses:
+        '200':
+          description: returns editor details
+          content: 
+            application/json:
+              schema: 
+                $ref: '#definitions/editor'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /getAllEditors:
+    get:
+      tags: [editor]
+      summary: returns all the editors
+      security:
+        - APIKey: []
+      responses:
+        '200':
+          description: returns all the editors
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties: 
+                  editors:
+                    type: string
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+    
+  /getArticles:
+    get:
+      tags: [article]
+      summary: returns the articles by all editors
+      security: 
+        - APIKey: []
+      responses:
+        '200':
+          description: returns the articles by all editors
+          content: 
+            application/json:
+              schema: 
+                $ref: '#definitions/article'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /createArticle:
+    post:
+      tags: [article]
+      summary: add a article by editor
+      security: 
+        - APIKey: []
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      requestBody:
+        description: 
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                content:
+                  type: string
+      responses:
+        '201':
+          description: Article created Successfully ...
+        '400':
+          description: Validation Error
+        '500':
+          description: Internal Server Error
+
+  /articleByEditor/{id}:
+    get:
+      tags: [article]
+      summary: returns all the article of the editor
+      security: 
+        - APIKey: []
+      parameters:
+        - name: id
+          default: '625330b10e4e7c3ecc0671f3'
+          in: path
+          schema:
+            type: string
+      responses:
+        '200':
+          description: returns the article by the editor
+          content: 
+            application/json:
+              schema: 
+                $ref: '#definitions/article'
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  
+
+  
