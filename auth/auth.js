@@ -1,5 +1,5 @@
 const passport = require("passport");
-const { check, validationResult } = require("express-validator/check");
+const { check, validationResult } = require("express-validator");
 const localStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 const UserModel = require("../models/user");
